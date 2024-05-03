@@ -35,23 +35,24 @@ apobec= SequenceRange('place_holder', 'place_holder', int(38952741), int(3899280
 
 #read in the germline cnv file
 cnv = pd.read_csv(input_file, comment='#', sep='\t', header=None)
+cnv.to_csv(sample + '_APOBEC3A_B_germline_polymorphism_overlap.csv',index=False)
 ##apobec gene is on chr22 so filter for that
-cnv = cnv[cnv[0]=='chr22']
+#cnv = cnv[cnv[0]=='chr22']
 ##filter for any value <DUP] and <DEL> indicating a polymorphism.
-cnv = cnv[cnv[4]!='.']
+#cnv = cnv[cnv[4]!='.']
 ##get the start and stop of the region
-cnv[['DRAGEN','TYPE','region']] = cnv[2].str.split(':',expand=True)
-cnv[['start','end']] = cnv['region'].str.split('-',expand=True)
-cnv = cnv.reset_index(drop=True)
-apobec_overlap = pd.DataFrame()
-if len(cnv.index) > 0:    
-    for amp in range(len(cnv.index)):
-        cnv_range= SequenceRange('place_holder', 'place_holder', int(cnv['start'][amp]), int(cnv['end'][amp]), str(cnv[0][amp]))
-        if cnv_range.overlaps(apobec) and cnv_range.chrom == apobec.chrom:
-            apobec_overlap = pd.concat([apobec_overlap, cnv.iloc[[amp]] ])
-            #genes_in_amps[amp].append(gene.name)
-    apobec_overlap['sample']=sample 
-    apobec_overlap = apobec_overlap.reset_index(drop=True)
+#cnv[['DRAGEN','TYPE','region']] = cnv[2].str.split(':',expand=True)
+#cnv[['start','end']] = cnv['region'].str.split('-',expand=True)
+#cnv = cnv.reset_index(drop=True)
+#apobec_overlap = pd.DataFrame()
+#if len(cnv.index) > 0:    
+#    for amp in range(len(cnv.index)):
+#        cnv_range= SequenceRange('place_holder', 'place_holder', int(cnv['start'][amp]), int(cnv['end'][amp]), str(cnv[0][amp]))
+#        if cnv_range.overlaps(apobec) and cnv_range.chrom == apobec.chrom:
+#            apobec_overlap = pd.concat([apobec_overlap, cnv.iloc[[amp]] ])
+#            #genes_in_amps[amp].append(gene.name)
+#    apobec_overlap['sample']=sample 
+#    apobec_overlap = apobec_overlap.reset_index(drop=True)
 
 #output amps_df
-apobec_overlap.to_csv(sample + '_APOBEC3A_B_germline_polymorphism_overlap.csv',index=False)
+#apobec_overlap.to_csv(sample + '_APOBEC3A_B_germline_polymorphism_overlap.csv',index=False)
