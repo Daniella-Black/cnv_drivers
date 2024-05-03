@@ -11,7 +11,7 @@ Channel
 //run the script to make MTR input on above file paths
 process  CloudOS_MTR_input{
     tag"$sample"
-    //publishDir "${params.outdir}/$tumour_sample_platekey", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy'
     errorStrategy 'ignore'
     
     input:
