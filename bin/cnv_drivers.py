@@ -21,97 +21,37 @@ my_parser = argparse.ArgumentParser(description='find the missing data in cnv fi
 my_parser.add_argument('-sample',
                        type=str,
                        help='sample')
-my_parser.add_argument('-ploidy',
-                       type=float,
-                       help='ploidy')
-my_parser.add_argument('-gene_df',
+my_parser.add_argument('-input_file',
                        type=str,
-                       help='path to the df of genes and cooridnates of canonical transcript')
-my_parser.add_argument('-somatic_cnv_vcf',
-                       type=str,
-                       help='path to the mtr input cnv of the sample')
-my_parser.add_argument('-organ',
-                       type=str,
-                       help='organ')
-####data input
+                       help='path to the germline vcf')
+
 
 args = my_parser.parse_args()
 sample = args.sample
-ploidy = args.ploidy
-organ = args.organ
-gene_df_path = args.gene_df
-cnv_path = args.somatic_cnv_vcf
-    
-    
-amps = list()
-missing_gene_data_sample= list()
-gene_df = pd.read_csv(gene_df_path) 
-#gene_df=gene_df.dropna()
+input_file = args.input_file
 
-#set threshold for amplifications
-if ploidy <2.5:
-    amp_threshold = 5
-elif ploidy >= 2.5:
-    amp_threshold = 9
 
-    
-#file_exists = exists(cnv_path):
-try:    
-    cnv = pd.read_csv(cnv_path, '\t')
-    cnv['total_cn'] = cnv['major_cn'] + cnv['minor_cn']
-    total_cn = list(cnv['total_cn'])
-    cnv['id'] = cnv['seqnames'].astype(str) + '_' + cnv['start'].astype(str) + '_' + cnv['end'].astype(str) + '_' + cnv['total_cn'].astype(str) +'_' + sample
-    id_list = list(cnv['id'])
-    for contig in range(len(total_cn)):
-        if total_cn[contig] >= amp_threshold: 
-            amps.append(id_list[contig]) 
-    #take the list of amps obtained in for loop above and convert to a table
-    if len(amps) >0:
-        amps_df = pd.DataFrame(amps)
-        amps_df[[ 'chr', 'start', 'end','total_cn', 'sample']] = amps_df[0].str.split('_', 4, expand=True)
-        amps_df.drop(columns=[0])
-    else:
-        amps_df = pd.DataFrame(columns=[0])
-    ##for each contig (no matter if it is amplified) report whether any contig overlaps with gene of interest - this is to identify samples with no data for the gene of interest for i in range(len(gene_df.index)): ##need file with all coding gene name chromosome coordinates #for gene in gene_df:
-    genes_in_amps = [[] for _ in range(len(amps_df.index))]
-    for i in range(len(gene_df.index)):  
-        gene  = SequenceRange(gene_df['gene_name'][i], gene_df['transcript_ID'][i], gene_df['start'][i], gene_df['end'][i], gene_df['chr'][i])
-        ##find the genes with missing data
-        contig_overlapping_gene = list()
-        cnv_chr = cnv.loc[cnv['seqnames'].astype('str') == gene.chrom]
-        cnv_chr.index = pd.RangeIndex(len(cnv_chr.index))
-        for contig in range(len(list(cnv_chr['total_cn']))):
-            contig_range= SequenceRange('place_holder', 'place_holder', int(cnv_chr['start'][contig]), int(cnv_chr['end'][contig]), str(cnv_chr['seqnames'][contig]))
-            if contig_range.overlaps(gene):
-                contig_overlapping_gene.append(id_list[contig])
-        if len(contig_overlapping_gene)== 0:
-            missing_gene_data_sample.append(gene.name + '_' + gene.transcript + '_' +str(gene.start) + '_' +str(gene.end) +'_' +gene.chrom + '_' + sample)
-        ##report the genes in each amp
-        if len(amps) > 0:    
-            for amp in range(len(amps_df.index)):
-                amp_range= SequenceRange('place_holder', 'place_holder', int(amps_df['start'][amp]), int(amps_df['end'][amp]), str(amps_df['chr'][amp]))
-                if amp_range.overlaps(gene) and amp_range.chrom == gene.chrom:
-                    genes_in_amps[amp].append(gene.name +'_' + gene.transcript + '_' +str(gene.start) + '_' +str(gene.end) + '_' +gene.chrom + '_' + sample)
-                    #genes_in_amps[amp].append(gene.name)
-    amps_df['genes_in_amps'] = genes_in_amps
-        
-    #print(sample)
-    with open(sample +  '_' +organ + '_mtr_format_cnv_missing.txt', 'w') as f:
-        f.write(sample+' complete')
-except FileNotFoundError as e:
-    with open(sample + '_' +organ + '_mtr_format_cnv_missing.txt', 'w') as f:
-        f.write(sample+' no mtr format cnv file')
-        
-if len(missing_gene_data_sample) >0:
-    missing_data_samples_gene_df = pd.DataFrame(missing_gene_data_sample)
-    #missing_data_samples_gene_df = missing_data_samples_mdm2_df.rename(columns={0: 'missing_mdm2_samples'})
-    missing_data_samples_gene_df[['gene', 'transcript_ID', 'start', 'end','chr', 'sample']] = missing_data_samples_gene_df[0].str.split('_', 5, expand=True)
-    missing_data_samples_gene_df.drop(columns=[0])
-else:
-    missing_data_samples_gene_df = pd.DataFrame(columns=[0])
+apobec= SequenceRange('place_holder', 'place_holder', int(38952741), int(38992804), str('chr22'))
 
-#output table of genes with missing data                                                                                                 
-missing_data_samples_gene_df.to_csv(sample + '_' +organ +'_genes_with_missing_data.csv')
+#read in the germline cnv file
+cnv = pd.read_csv(input_file, comment='#', sep='\t', header=None)
+##apobec gene is on chr22 so filter for that
+cnv = cnv[cnv[0]=='chr22']
+##filter for any value <DUP] and <DEL> indicating a polymorphism.
+cnv = cnv[cnv[4]!='.']
+##get the start and stop of the region
+cnv[['DRAGEN','TYPE','region']] = cnv[2].str.split(':',expand=True)
+cnv[['start','end']] = cnv['region'].str.split('-',expand=True)
+cnv = cnv.reset_index(drop=True)
+apobec_overlap = pd.DataFrame()
+if len(cnv.index) > 0:    
+    for amp in range(len(cnv.index)):
+        cnv_range= SequenceRange('place_holder', 'place_holder', int(cnv['start'][amp]), int(cnv['end'][amp]), str(cnv[0][amp]))
+        if cnv_range.overlaps(gene) and cnv_range.chrom == gene.chrom:
+            apobec_overlap = pd.concat([apobec_overlap, cnv.iloc[[amp]] ])
+            #genes_in_amps[amp].append(gene.name)
+    apobec_overlap['sample']=sample 
+    apobec_overlap = apobec_overlap.reset_index(drop=True)
 
 #output amps_df
-amps_df.to_csv(sample + '_' +organ + '_amplifications.csv')
+apobec_overlap.to_csv(sample + '_APOBEC3A_B_germline_polymorphism_overlap.csv',index=False)
