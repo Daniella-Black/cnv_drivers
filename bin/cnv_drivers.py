@@ -47,7 +47,7 @@ apobec_overlap = pd.DataFrame()
 if len(cnv.index) > 0:    
     for amp in range(len(cnv.index)):
         cnv_range= SequenceRange('place_holder', 'place_holder', int(cnv['start'][amp]), int(cnv['end'][amp]), str(cnv[0][amp]))
-        if cnv_range.overlaps(gene) and cnv_range.chrom == gene.chrom:
+        if cnv_range.overlaps(apobec) and cnv_range.chrom == apobec.chrom:
             apobec_overlap = pd.concat([apobec_overlap, cnv.iloc[[amp]] ])
             #genes_in_amps[amp].append(gene.name)
     apobec_overlap['sample']=sample 
