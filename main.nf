@@ -11,7 +11,7 @@ Channel
 //run the script to make MTR input on above file paths
 process  CloudOS_MTR_input{
     errorStrategy 'ignore'
-    container = 'public.ecr.aws/b0q1v7i3/pydocker:latest' 
+    //container = 'public.ecr.aws/b0q1v7i3/pydocker:latest' 
     tag"$tumour_sample_platekey"
     publishDir "${params.outdir}/$tumour_sample_platekey", mode: 'copy'
     
