@@ -14,9 +14,9 @@ process  CloudOS_MTR_input{
     container = 'dockeraccountdani/pydocker:latest' 
     tag"$tumour_sample_platekey"
     publishDir "${params.outdir}/$tumour_sample_platekey", mode: 'copy'
-    maxForks 900
-    errorStrategy 'retry'
-    maxRetries 3
+    //maxForks 900
+    //errorStrategy 'retry'
+    //maxRetries 3
     
     input:
     set val(tumour_sample_platekey), file(somatic_cnv_vcf), val(ploidy), file(gene_df) from ch_input
