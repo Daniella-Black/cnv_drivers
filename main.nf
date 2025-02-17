@@ -21,10 +21,10 @@ process  CloudOS_MTR_input{
     set val(tumour_sample_platekey), file(somatic_cnv_vcf), val(ploidy), file(gene_df) from ch_input
 
     output:
-    file "*_mtr_format_cnv_missing.txt"
-    file "*_genes_with_missing_data.csv"
+    //file "*_mtr_format_cnv_missing.txt"
+    //file "*_genes_with_missing_data.csv"
     file "*_hom_dels.csv"
-    file "*_genes_with_missing_data_next_to_hom_dels.csv"
+    //file "*_genes_with_missing_data_next_to_hom_dels.csv"
  
     script:
     """
