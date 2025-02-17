@@ -175,10 +175,11 @@ else:
     missing_data_genes_next_to_amps_df = pd.DataFrame(columns=[0])
 
 #output table of genes with missing data                                                                                                 
-missing_data_samples_gene_df.to_csv(sample + '_genes_with_missing_data.csv')
+#missing_data_samples_gene_df.to_csv(sample + '_genes_with_missing_data.csv')
 
 #output table of genes with missing data next to amps                                                                                          
-missing_data_genes_next_to_amps_df.to_csv(sample + '_genes_with_missing_data_next_to_hom_dels.csv')
+#missing_data_genes_next_to_amps_df.to_csv(sample + '_genes_with_missing_data_next_to_hom_dels.csv')
 
 #output amps_df
+amps_d['sample'] = sample
 amps_df.to_csv(sample + '_hom_dels.csv')
