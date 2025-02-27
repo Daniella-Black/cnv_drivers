@@ -15,8 +15,7 @@ process  CloudOS_MTR_input{
     publishDir "${params.outdir}/$tumour_sample_platekey", mode: 'copy'
     //maxForks 900
     errorStrategy 'ignore'
-    //maxRetries 3
-    
+
     input:
     set val(tumour_sample_platekey), file(somatic_cnv_vcf), val(ploidy), file(gene_df) from ch_input
 
