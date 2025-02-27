@@ -52,7 +52,7 @@ tuple(row[0], file(row[1]), row[2], file(row[3])) // Create a tuple with three e
 
 
 process cnv_drivers {
-tag { sample }
+tag { tumour_sample_platekey }
 
 
 input:
