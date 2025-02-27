@@ -179,5 +179,5 @@ else:
 #missing_data_genes_next_to_amps_df.to_csv(sample + '_genes_with_missing_data_next_to_hom_dels.csv')
 
 #output amps_df
-amps_d['sample'] = sample
+amps_df['sample'] = sample
 amps_df.to_csv(sample + '_hom_dels.csv')
