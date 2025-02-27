@@ -44,19 +44,20 @@ cnv_path = args.somatic_cnv_vcf
     
     
 amps = list()
+homdels=list()
 missing_gene_data_sample= list()
 missing_data_genes_next_to_amps = list()
 gene_df = pd.read_csv(gene_df_path) 
 #gene_df=gene_df.dropna()
 
 #set threshold for amplifications
-if driver_type == 'amp':
-    if ploidy <2.5:
-        amp_threshold = 5
-    elif ploidy >= 2.5:
-        amp_threshold = 9
-if driver_type == 'hom_del':
-    amp_threshold = 0
+
+if ploidy <2.5:
+    amp_threshold = 5
+elif ploidy >= 2.5:
+    amp_threshold = 9
+
+homdel_threshold = 0
 
     
 #file_exists = exists(cnv_path):
@@ -72,20 +73,27 @@ total_cn = list(cnv['total_cn'])
 cnv['id'] = cnv['seqnames'].astype(str) + '_' + cnv['start'].astype(str) + '_' + cnv['end'].astype(str) + '_' + cnv['total_cn'].astype(str) +'_' + sample
 id_list = list(cnv['id'])
 for contig in range(len(total_cn)):
-    if driver_type == 'amp':
+    ###amplification
         if total_cn[contig] >= amp_threshold: 
             amps.append(id_list[contig]) 
-    if driver_type == 'hom_del':
-        #if width[contig] < 21500000:
-        #if width[contig] < 3000000 and width[contig] > 600000:
-        #if width[contig] < 1500000:
-        if total_cn[contig] == amp_threshold: 
-            amps.append(id_list[contig])         
+    ##homdel
+        if total_cn[contig] == homdel_threshold : 
+            homdel.append(id_list[contig])         
 #take the list of amps obtained in for loop above and convert to a table
 if len(amps) >0:
     amps_df = pd.DataFrame(amps)
     amps_df[[ 'chr', 'start', 'end','total_cn', 'sample']] = amps_df[0].str.split('_', 4, expand=True)
     amps_df.drop(columns=[0])
+    amps_df['type']= 'AMP'
+
+if len(homdel) >0:
+    homdel_df = pd.DataFrame(homdel)
+    homdel_df[[ 'chr', 'start', 'end','total_cn', 'sample']] = homdel_df[0].str.split('_', 4, expand=True)
+    homdel_df.drop(columns=[0])
+    homdel_df['type']= 'HOMDEL'
+
+if len(homdel) + len(amps) >0:
+    amps_df = pd.concat([amps_df, homdel_df], ignore_index=True)
 else:
     amps_df = pd.DataFrame(columns=[0])
 ##for each contig (no matter if it is amplified) report whether any contig overlaps with gene of interest - this is to identify samples with no data for the gene of interest for i in range(len(gene_df.index)): ##need file with all coding gene name chromosome coordinates #for gene in gene_df:
@@ -154,29 +162,6 @@ for i in range(len(gene_df.index)):
                 #genes_in_amps[amp].append(gene.name)
 amps_df['genes_in_amps'] = genes_in_amps
         
-    #print(sample)
-if len(missing_gene_data_sample) >0:
-    missing_data_samples_gene_df = pd.DataFrame(missing_gene_data_sample)
-    #missing_data_samples_gene_df = missing_data_samples_mdm2_df.rename(columns={0: 'missing_mdm2_samples'})
-    missing_data_samples_gene_df[['gene', 'transcript_ID', 'start', 'end','chr', 'sample']] = missing_data_samples_gene_df[0].str.split('_', 5, expand=True)
-    missing_data_samples_gene_df.drop(columns=[0])
-else:
-    missing_data_samples_gene_df = pd.DataFrame(columns=[0])
-    
-if len(missing_data_genes_next_to_amps) >0:
-    missing_data_genes_next_to_amps_df = pd.DataFrame(missing_data_genes_next_to_amps)
-    #missing_data_samples_gene_df = missing_data_samples_mdm2_df.rename(columns={0: 'missing_mdm2_samples'})
-    #missing_data_genes_next_to_amps_df[['gene', 'transcript_ID', 'start', 'end','chr', 'sample']] = missing_data_genes_next_to_amps_df[0].str.split('_', 5, expand=True)
-    missing_data_genes_next_to_amps_df[['gene', 'transcript_ID', 'start', 'end','chr', 'total_cn_contig_after_contig_before', 'sample']] = missing_data_genes_next_to_amps_df[0].str.split('_', 6, expand=True)
-    missing_data_genes_next_to_amps_df.drop(columns=[0])
-else:
-    missing_data_genes_next_to_amps_df = pd.DataFrame(columns=[0])
-
-#output table of genes with missing data                                                                                                 
-#missing_data_samples_gene_df.to_csv(sample + '_genes_with_missing_data.csv')
-
-#output table of genes with missing data next to amps                                                                                          
-#missing_data_genes_next_to_amps_df.to_csv(sample + '_genes_with_missing_data_next_to_hom_dels.csv')
 
 #output amps_df
 amps_df['sample'] = sample
