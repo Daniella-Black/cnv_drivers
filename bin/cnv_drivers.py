@@ -78,7 +78,7 @@ for contig in range(len(total_cn)):
             amps.append(id_list[contig]) 
     ##homdel
         if total_cn[contig] == homdel_threshold : 
-            homdel.append(id_list[contig])         
+            homdels.append(id_list[contig])         
 #take the list of amps obtained in for loop above and convert to a table
 if len(amps) >0:
     amps_df = pd.DataFrame(amps)
@@ -86,8 +86,8 @@ if len(amps) >0:
     amps_df.drop(columns=[0])
     amps_df['type']= 'AMP'
 
-if len(homdel) >0:
-    homdel_df = pd.DataFrame(homdel)
+if len(homdels) >0:
+    homdel_df = pd.DataFrame(homdels)
     homdel_df[[ 'chr', 'start', 'end','total_cn', 'sample']] = homdel_df[0].str.split('_', 4, expand=True)
     homdel_df.drop(columns=[0])
     homdel_df['type']= 'HOMDEL'
