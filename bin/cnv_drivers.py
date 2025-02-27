@@ -92,7 +92,7 @@ if len(homdels) >0:
     homdel_df.drop(columns=[0])
     homdel_df['type']= 'HOMDEL'
 
-if len(homdel) + len(amps) >0:
+if len(homdels) + len(amps) >0:
     amps_df = pd.concat([amps_df, homdel_df], ignore_index=True)
 else:
     amps_df = pd.DataFrame(columns=[0])
