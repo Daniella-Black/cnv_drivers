@@ -62,7 +62,10 @@ if driver_type == 'hom_del':
 #file_exists = exists(cnv_path):
 
 cnv = pd.read_csv(cnv_path, '\t')
-cnv['total_cn'] = cnv['major_cn'] + cnv['minor_cn']
+
+
+cnv = cnv.rename(columns={'total.copy.number.inTumour':'total_cn','Chromosome':'seqnames','chromStart':'start','chromEnd':'end','minor.copy.number.inTumour':'minor_cn'})
+cnv['major_cn'] = cnv['total_cn'] -cnv['minor_cn']
 cnv['width'] = cnv['end'] - cnv['start']
 width = list(cnv['width'])
 total_cn = list(cnv['total_cn'])
