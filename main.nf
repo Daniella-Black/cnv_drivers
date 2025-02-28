@@ -54,7 +54,7 @@ tuple(row[0], file(row[1]), row[2], file(row[3])) // Create a tuple with three e
 process cnv_drivers {
 tag { tumour_sample_platekey }
 
-
+errorStrategy 'ignore'
 input:
 tuple val(tumour_sample_platekey), path(somatic_cnv_vcf), val(ploidy), path(gene_df)
 
