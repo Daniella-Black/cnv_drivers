@@ -59,7 +59,7 @@ input:
 tuple val(tumour_sample_platekey), path(somatic_cnv_vcf), val(ploidy), path(gene_df)
 
 output:
-  file "*_hom_dels.csv"
+  file "*'_annotated_CN_events.csv"
 script:
 """
 cnv_drivers.py -sample '$tumour_sample_platekey' -somatic_cnv_vcf '$somatic_cnv_vcf' -ploidy '$ploidy' -gene_df '$gene_df'
@@ -69,6 +69,6 @@ cnv_drivers.py -sample '$tumour_sample_platekey' -somatic_cnv_vcf '$somatic_cnv_
 
 workflow {
 
- drivers = cnv_drivers(ch_input).collectFile(name: 'combined_homozygous_deletions.tsv',cache:'lenient',keepHeader:true, storeDir: "${params.outdir}/call_drivers")
+ drivers = cnv_drivers(ch_input).collectFile(name: 'annotated_CN_events.csv',cache:'lenient',keepHeader:true, storeDir: "${params.outdir}/call_drivers")
 
 }
