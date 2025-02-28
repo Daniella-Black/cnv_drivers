@@ -59,7 +59,7 @@ input:
 tuple val(tumour_sample_platekey), path(somatic_cnv_vcf), val(ploidy), path(gene_df)
 
 output:
-  file "*'_annotated_CN_events.csv"
+  file "*_annotated_CN_events.csv"
 script:
 """
 cnv_drivers.py -sample '$tumour_sample_platekey' -somatic_cnv_vcf '$somatic_cnv_vcf' -ploidy '$ploidy' -gene_df '$gene_df'
