@@ -125,8 +125,24 @@ for i in range(len(gene_df.index)):
             if amp_range.overlaps(gene) and amp_range.chrom == gene.chrom:
                 genes_in_event[amp].append(gene.name +'_' + gene.transcript + '_' +str(gene.start) + '_' +str(gene.end) + '_' +gene.chrom + '_' + sample)
 cn_events['genes_in_CN_event'] = genes_in_event
-        
+
+cn_events['genes_in_CN_event'] = cn_events['genes_in_CN_event'].astype('str') 
+
+##make a friendlier output file
+d = {}
+for feature in set(cn_events['type']):
+    d[feature] = {}
+    tmp = cn_events[cn_events['type']==feature]
+    for gene in set(gene_df['gene_name']):
+        d[feature][gene] = {}
+        if tmp['genes_in_CN_event'].str.contains(gene+'_').any() ==True:
+            d[feature][gene] = feature
+        else:
+            d[feature][gene] = 'no_driver'
 
 #output amps_df
+
+cn_events = pd.DataFrame.from_dict(d).T
 cn_events['sample'] = sample
+cn_events['type'] = cn_events.index
 cn_events.to_csv(sample + '_annotated_CN_events.csv',index=False)
