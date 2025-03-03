@@ -101,11 +101,11 @@ if len(homdels) >0:
     homdel_df.drop(columns=[0])
     homdel_df['type']= 'HOMDEL'
 
-if len(homdels) >0 & len(amps) >0:
+if len(homdels) >0 and len(amps) >0:
     cn_events = pd.concat([amps_df, homdel_df], ignore_index=True)
-elif  len(homdels) ==0 & len(amps) >0:
+elif  len(homdels) ==0 and len(amps) >0:
     cn_events = amps_df
-elif len(homdels) >0 & len(amps) ==0:
+elif len(homdels) >0 and len(amps) ==0:
     cn_events = homdel_df
 else:
     cn_events = pd.DataFrame(columns=[0])
