@@ -64,7 +64,7 @@ homdel_threshold = 0
 cnv = pd.read_csv(cnv_path, '\t')
 
 #read in the genes for analysis
-gene_df = pd.read_csv(gene_df_path) 
+gene_df = pd.read_table(gene_df_path,sep='\t') 
 
 ##because checking if chromosome values match, prep the gene df by removing any chr, Chr strings before the chromosome number
 gene_df['chr'] = gene_df['chr'].str.replace('chr','')
@@ -91,13 +91,13 @@ for contig in range(len(total_cn)):
 #take the list of amplification and homozygous deletions obtained in for loop above and convert to a table
 if len(amps) >0:
     amps_df = pd.DataFrame(amps)
-    amps_df[[ 'chr', 'start', 'end','total_cn', 'sample']] = amps_df[0].str.split('_', 4, expand=True)
+    amps_df[[ 'chr', 'start', 'end','total_cn', 'sample']] = amps_df[0].str.split('_', n=4, expand=True)
     amps_df.drop(columns=[0])
     amps_df['type']= 'AMP'
 
 if len(homdels) >0:
     homdel_df = pd.DataFrame(homdels)
-    homdel_df[[ 'chr', 'start', 'end','total_cn', 'sample']] = homdel_df[0].str.split('_', 4, expand=True)
+    homdel_df[[ 'chr', 'start', 'end','total_cn', 'sample']] = homdel_df[0].str.split('_', n=4, expand=True)
     homdel_df.drop(columns=[0])
     homdel_df['type']= 'HOMDEL'
 
