@@ -61,10 +61,10 @@ homdel_threshold = 0
 
     
 #read in the copy number file (expecting ascat style input, which are then modified below)
-cnv = pd.read_csv(cnv_path, '\t')
+cnv = pd.read_table(cnv_path, sep='\t')
 
 #read in the genes for analysis
-gene_df = pd.read_table(gene_df_path,sep='\t') 
+gene_df = pd.read_csv(gene_df_path) 
 
 ##because checking if chromosome values match, prep the gene df by removing any chr, Chr strings before the chromosome number
 gene_df['chr'] = gene_df['chr'].str.replace('chr','')
